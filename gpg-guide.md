@@ -216,7 +216,7 @@ $ gpg --keyserver <keyserver-name> --send <key-id>
 
 If you've got a revocation certificate and are sure you never might lose access to both your private key and revocation certificate at the same time (consider fire, (physical) theft, official institutions searching your house), there is absolutely no use in setting an expiry date apart from possible confusion and more work extending it.
 
-Even worse, expiry dates might provide a false sense of security. The key on the key servers expired, so why bother to revoke it? There is a large number of well-connected RSA 512 bit keys on the key server network, and probably a comparabily large number of weak DSA keys (because of the Debian RNG problems). With faster processors and possibly new knowledge on algorithm weaknesses, an attacker might in future be able to crack the expired, but non-revoked key and use it!
+Even worse, expiry dates might provide a false sense of security. The key on the keyservers expired, so why bother to revoke it? There is a large number of well-connected RSA 512 bit keys on the keyserver network, and probably a comparabily large number of weak DSA keys (because of the Debian RNG problems). With faster processors and possibly new knowledge on algorithm weaknesses, an attacker might in future be able to crack the expired, but non-revoked key and use it!
 
 ### Backup
 
@@ -349,7 +349,7 @@ Setting an expiration date means that you will need to extend that expiration da
 
 For subkeys, the effect is rather simple: after a given time frame, the subkey will expire. This expiry date can only be changed using the primary key. If an attacker gets hold of your subkey (and only this), it will automatically be inactivated after the expiry date.The expiry date of a subkey is a great tool to announce you switch your subkeys on a regular base, and that it's time for others to update your key after a given time.
 
-For primary keys, the situation is different. If you have access to the private key, you can change the expiry date as you wish. This means, if an attacker gets access to your private key, he can extend the validity period arbitrarily. Worst case, you lose access to the private key at the same time, then even you cannot revoke the public key any more (you do have a printed or otherwise offline and safely stored revocation certificate, do you?). An expiry date might help in the case you just lose control over the key (while no attacker has control over it). The key will automatically expire after a given time, so there wouldn't be an unusable key with your name on it sitting forever on the key servers.
+For primary keys, the situation is different. If you have access to the private key, you can change the expiry date as you wish. This means, if an attacker gets access to your private key, he can extend the validity period arbitrarily. Worst case, you lose access to the private key at the same time, then even you cannot revoke the public key any more (you do have a printed or otherwise offline and safely stored revocation certificate, do you?). An expiry date might help in the case you just lose control over the key (while no attacker has control over it). The key will automatically expire after a given time, so there wouldn't be an unusable key with your name on it sitting forever on the keyservers.
 
 ### Replacing a compromised key
 
@@ -401,20 +401,20 @@ Send public key to keyserver, so that others can retrieve the key:
 $ gpg --keyserver <keyserver-name> --send-keys <key-id>
 ```
 
-Find details about a key on the key server w/o importing it:
+Find details about a key on the keyserver w/o importing it:
 
 ```bash
 $ gpg --search-keys <key-id> --keyserver <keyserver-name>
 ```
 
-Import key from key server:
+Import key from keyserver:
 
 ```bash
 $ gpg --recv-keys <key-id>
 ```
 
 The [sks keyservers pool][sks-pool] is often recommended. The communication with
-the key server is established using a protocol called **hkps**.
+the keyserver is established using a protocol called **hkps**.
 
 Other keyservers:
 
@@ -428,12 +428,12 @@ Other keyservers:
 Note: The `--keyserver` option is not required, when the keyserver is specified
 in `~/.gnupg/dirmngr.conf`.
 
-To fetch keys automatically from a key server as needed, add the following to
+To fetch keys automatically from a keyserver as needed, add the following to
 `~/.gnupg/gpg.conf`:
 
         keyserver-options autokey-retrieve
 
-More details on how to setup a key server, see [GPG Best
+More details on how to setup a keyserver, see [GPG Best
 Practices][best-practices]. Note that since GnuPG 2.1 some options have been
 moved to `dirmngr` and must be added to `~/.gnupg/dirmngr.conf`.
 
@@ -467,13 +467,13 @@ If you are confident you have the right fingerprint from the owner of the key, t
 
 Note the single quote marks above (’), which should surround your full fingerprint and are necessary to make this command work. Double-quotes (") also work.
 
-#### Tip: Don't rely on the Key ID
+#### Tip: Don't rely on the key ID
 
-Short OpenPGP Key IDs, for example `0×2861A790`, are 32 bits long. They have been shown to be easily spoofed by another key with the same Key ID. Long OpenPGP Key IDs (for example `0xA1E6148633874A3D`) are 64 bits long. They are trivially collidable, which is also a potentially serious problem.
+Short OpenPGP key IDs, for example `0×2861A790`, are 32 bits long. They have been shown to be easily spoofed by another key with the same key ID. Long OpenPGP key IDs (for example `0xA1E6148633874A3D`) are 64 bits long. They are trivially collidable, which is also a potentially serious problem.
 
-If you want to deal with a cryptographically-strong identifier for a key, you should use the full fingerprint. You should never rely on the short, or even long, Key ID.
+If you want to deal with a cryptographically-strong identifier for a key, you should use the full fingerprint. You should never rely on the short, or even long, key ID.
 
-You should probably at least set keyid-format `0xlong` and with-fingerprint gpg options (put them in `~/.gnupg/gpg.conf`) to increase the Key ID display size to 64 bit under regular use, and to always display the fingerprint.
+You should probably at least set keyid-format `0xlong` and with-fingerprint gpg options (put them in `~/.gnupg/gpg.conf`) to increase the key ID display size to 64 bit under regular use, and to always display the fingerprint.
 
  You can always find your primary key’s fingerprint (for example, if you want to give your fingerprint to someone to verify at a keysigning party), you can display the fingerprints of all of your secret keys by running this:
 
@@ -688,6 +688,7 @@ TODO
 
 TODO:
 
--   TODO,
+-   TODO, Ortogrphy, Link alle section, Grassetto
+-   Reogranize (See gpg-guide vero)
 -   GitHub Key
 -   Sito (My old key # is lost!, My fingerprint is #)
