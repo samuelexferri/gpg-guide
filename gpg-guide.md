@@ -418,12 +418,14 @@ the keyserver is established using a protocol called **hkps**.
 
 Other keyservers:
 
--   <http://pool.sks-keyservers.net>
--   <http://keys.openpgp.org>
--   <http://keys.gnupg.net/>
--   <http://pgp.mit.edu>
--   <http://keyring.debian.org>
--   <http://keyserver.ubuntu.com>
+-   pool.sks-keyservers.net
+-   keys.openpgp.org
+-   pgp.mit.edu
+-   keyserver.pgp.com
+-   keys.gnupg.net
+-   zimmermann.mayfirst.org
+-   keyring.debian.org
+-   keyserver.ubuntu.com
 
 Note: The `--keyserver` option is not required, when the keyserver is specified
 in `~/.gnupg/dirmngr.conf`.
