@@ -6,6 +6,8 @@
 
 A simple guide to GNU Privacy Guard
 
+See gpg-guide.md
+
 ![alt text](https://img.shields.io/badge/Language-English-infomrmational?style=for-the-badge)
 
 ## Authors
@@ -16,7 +18,7 @@ A simple guide to GNU Privacy Guard
 
 ### Credits
 
--   [GPG Guide][https://github.com/bfrg/gpg-guide]
+-   [GPG Guide](https://github.com/bfrg/gpg-guide/)
 
 ## Version
 
