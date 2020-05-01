@@ -66,9 +66,9 @@ $ gpg --expert --full-gen-key
 
 The user will be prompted to answer several questions:
 
-1.  Type: `RSA (set your own capabilities)`.
-2.  Capability: only `(C) Certify`; disable the default capabilities by entering the related letter  one capability after the other.
-3.  Keysize: `4096 bits`.
+1.  Algorithm: `RSA (set your own capabilities)`.
+2.  Capability: only `Certify (C)`; disable the default capabilities by entering the related letter one capability after the other.
+3.  Size: `4096 bits`.
 4.  Expiration date: a period of a year is enough most of the time; it's possible to change it afterwards.
 5.  Details: real name, email address and comment for the key's purpose.
 6.  Passphrase (also blank space admitted).
@@ -223,9 +223,9 @@ Even worse, expiry dates might provide a false sense of security. The key on the
 Let’s save all keys:
 
 ```bash
-$ gpg --export --armor <key-id> --output <key-id>.pub.asc
-$ gpg --export-secret-keys --armor <key-id> --output <key-id>.priv.asc
-$ gpg --export-secret-subkeys --armor <key-id> --output <key-id>.sub_priv.asc
+$ gpg --export --armor <key-id> > <key-id>.pub.asc
+$ gpg --export-secret-keys --armor <key-id> > <key-id>.priv.asc
+$ gpg --export-secret-subkeys --armor <key-id> > <key-id>.sub_priv.asc
 ```
 
 By default GnuPG writes to STDOUT if no file is specified with the
@@ -274,7 +274,7 @@ Let’s check that we have only the private keys of the subkeys:
     ssb   rsa4096 2020-05-01 [S] [expires: 2021-05-01]
     ssb   rsa4096 2020-05-01 [A] [expires: 2021-05-01]
 
-The small # before sec indicates that the secret key of the master key no longer exists, it’s a stub instead.
+The small `#` before `sec` indicates that the secret key of the master key no longer exists, it’s a stub instead.
 
 Your computer is now ready for normal use.
 
@@ -322,6 +322,14 @@ Finally, run this command:
 ```bash
 $ source ~/.bashrc
 ```
+
+TODO (Qua sotto aggiunto)
+
+To choose a default key without having to specify `--default-key` on the command-line every time, create a configuration file (if it doesn't already exist), `~/.gnupg/gpg.conf`, and add a line containing
+
+`default-key <key-id>`
+
+Teplacing `<key-id>` with the key uid you want to use by default.
 
 ### Renew an expired key
 
@@ -693,4 +701,37 @@ TODO:
 -   TODO, Ortogrphy, Link alle section, Grassetto
 -   Reogranize (See gpg-guide vero)
 -   GitHub Key
--   Sito (My old key # is lost!, My fingerprint is #)
+-   Sito (My old key # is lost!, My fingerprint is #, Every year at 01/05 my publi key change! (Expiration of subkeys modify my pub))
+-   Controllare tutti le cartelle e i file delle config
+
+You're trying to delete a user ID, not a subkey. Use key [n] and delkey instead. From the help comand inside gpg --edit-key:
+
+uid         select user ID N
+key         select subkey N
+deluid      delete selected user IDs
+delkey      delete selected subkeys
+
+If you already shared your key with others, better revoke the key instead of deleting it. By deleting it, other's will not be able to realize you're not using it any more (you can't delete it on key servers and other's computers!), by revocation you're signalling "don't use this (sub)key any more".
+
+Private don't change. Master pub changed if i change expiration date or i add or do somtihign to subkeys.
+
+Pub si allunga solo per l'aggiunta di nuove chiavi/sottochiavi non della data di scadenza
+
+Se cifro un messaggio con una subkey mi servirà la chiave privata della subkeys per decifrarlo.
+La master privata serve solo per gestire le subkes non per decifrare.
+Ogni chiave decifra ciò che ha criptato sè stessa.
+
+Se ho due sub E come selezioni quella di default?
+gpg --default-key <yourKeyID> --sign-key <YourFriendsKeyID>
+
+Per vedere gli ID delle subkey bisogna nadare in edit
+
+These options are used to change the configuration and are usually found in the option file.
+\--default-key name
+    Use name as the default key to sign with. If this option is not used, the default key is the first key found in the secret keyring. Note that -u or --local-user overrides this option. This option may be given multiple times. In this case, the last key for which a secret key is available is used. If there is no secret key available for any of the specified values, GnuPG will not emit an error message but continue as if this option wasn’t given.
+
+    By default, GnuPG will use the most recently created
+
+Regarding how keys are selected with GnuPG: simply import the keys (gpg --import), GnuPG will select the proper key automatically. Usually, the required key is stored in the crypto message's headers, otherwise GnuPG will try all of the private keys.
+
+Quindi quando qualcuno usa la mia pub per criptare un file e inviarmelo di default usa la  pubblica della mia sottochiave E più recente. Io con il comando decrypt delego a GPG di trovare la privata (sarà quella E recente) per decifrare.
