@@ -267,7 +267,7 @@ Even worse, expiry dates might provide a false sense of security. The key on the
 
 **Note:** If you use the revocation certificate locally but the key revoked has not been sent to the servers, you can undo the revocation simply by deleting and reimporting the private keys from a previous backup.
 
-See [backup](gpg-guide.md#backup) section and [renewal of an expired key](gpg-guide.md#renewal-of-an-expired-key) section.
+See [backup](#backup) section and [renewal of an expired key](#renewal-of-an-expired-key) section.
 
 ### Backup
 
@@ -292,7 +292,7 @@ $ gpg --allow-secret-key-import --import <key-id>.priv.asc
 Keep your primary private key entirely offline! This is tricky to do but helps in protecting the very important primary key. If your primary key is stolen, the attacker can create new identities, revoke existing ones and completely impersonate you. Storing keys “offline” is therefore a good way to protect against such attacks.
 
 The public key can be freely distributed by sending it to friends, publishing on
-websites or registering it with public [keyservers](gpg-guide.md#keyservers).
+websites or registering it with public [keyservers](#keyservers).
 In order to encrypt a documents for another user as well as to verify their
 signatures, we need their public key.
 
@@ -370,7 +370,7 @@ $ gpg --edit-key <key-id>
 # gpg> save
 ```
 
-Then you may send your key to the [keyservers](gpg-guide.md#keyservers) to publish this change:
+Then you may send your key to the [keyservers](#keyservers) to publish this change:
 
 ```bash
 $ gpg --send-key <key-id>
@@ -559,7 +559,7 @@ GnuPG supports both symmetric key encryption and public key encryption:
 For a more thorough discussion see for instance [The GNU Privacy
 Handbook][gnu-handbook].
 
-See [symmetric key encryption](gpg-guide.md#symmetric-key-encryption) section and [public key encryption](gpg-guide.md#public-key-encryption) section.
+See [symmetric key encryption](#symmetric-key-encryption) section and [public key encryption](#public-key-encryption) section.
 
 ### Public key encryption
 
