@@ -58,9 +58,9 @@ But this only works for signing subkeys. If you have multiple encryption subkeys
 
 ### Faking the creation time
 
-In **OpenGPG** there is no defined "not valid before" parameter. There is the creation timestamp, but there is no defined behavior for dates in the future; implementations of OpenPGP might issue a warning, completely deny using the key or simply ignore the fact at all.
+In OpenGPG there is no defined "not valid before" parameter. There is the creation timestamp, but there is no defined behavior for dates in the future; implementations of OpenPGP might issue a warning, completely deny using the key or simply ignore the fact at all.
 
-**GnuPG** does not know an option to set the creation time, but the system time is used. The easiest and most general way is to change the system time to the desired date.
+GnuPG does not know an option to set the creation time, but the system time is used. The easiest and most general way is to change the system time to the desired date.
 
 For Linux, there is the very helpful tool `faketime`, which can be used to start other commands with arbitrary dates:
 
@@ -71,6 +71,8 @@ You might have to terminate `gpg-agent` so it gets restarted, if it does not see
 GnuPG also has a `--faketime` parameter, but it does only work if `--debug` is also set, which requires some compile options that are not always applied for production builds.
 
 You cannot take it for sure or even verify it, this is juts the date the signer "claims" to have signed the key on.
+
+Timezone used is GMT (UTC+00).
 
 _Back to the Future!_
 
