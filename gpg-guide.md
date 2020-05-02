@@ -56,6 +56,22 @@ One might be tempted to have one subkey per machine so that you only need to exc
 
 But this only works for signing subkeys. If you have multiple encryption subkeys, gpg is said to encrypt only for the most recent encryption subkey and not for all known and not revoked encryption subkeys.
 
+### Faking the creation time
+
+In **OpenGPG** there is no defined "not valid before" parameter. There is the creation timestamp, but there is no defined behavior for dates in the future; implementations of OpenPGP might issue a warning, completely deny using the key or simply ignore the fact at all.
+
+**GnuPG** does not know an option to set the creation time, but the system time is used. The easiest and most general way is to change the system time to the desired date.
+
+For Linux, there is the very helpful tool `faketime`, which can be used to start other commands with arbitrary dates:
+
+    faketime '2020-01-01 00:00:00' gpg --expert --full-gen-key
+
+You might have to terminate `gpg-agent` so it gets restarted, if it does not see (but use) the faked time.
+
+GnuPG also has a `--faketime` parameter, but it does only work if `--debug` is also set, which requires some compile options that are not always applied for production builds.
+
+_Back to the Future!_
+
 ## Creating new keys
 
 First create a master keypair (private and public keys):
@@ -160,6 +176,8 @@ Delete a private key:
 ```bash
 $ gpg --delete-secret-key <key-id>
 ```
+
+If you already shared your key with others, better revoke the key instead of deleting it. By deleting it, other's will not be able to realize you're not using it any more (you can't delete it on key servers and other's computers!), by revocation you're signalling "don't use this (sub)key any more".
 
 **Note:** `<key-id>` refers to a key by the name of its owner, email address,
 the key's fingerprint, by its 8-digit hex ID or similar.
@@ -367,13 +385,15 @@ For subkeys, the effect is rather simple: after a given time frame, the subkey w
 
 For primary keys, the situation is different. If you have access to the private key, you can change the expiry date as you wish. This means, if an attacker gets access to your private key, he can extend the validity period arbitrarily. Worst case, you lose access to the private key at the same time, then even you cannot revoke the public key any more (you do have a printed or otherwise offline and safely stored revocation certificate, do you?). An expiry date might help in the case you just lose control over the key (while no attacker has control over it). The key will automatically expire after a given time, so there wouldn't be an unusable key with your name on it sitting forever on the keyservers.
 
+**Note:** Private key don't change, public key yes! A public key changes if you change an expiration date or manage subkeys or user ID information. In particular, the public key is extended only for substantial changes (addition of keys, addition of user ID) but not for changing the expiration date!
+
 ### Replacement of a compromised key
 
 When replacing one uncompromised key with a newer (typically longer) one, using a transition period when both keys are trustworthy and participate in the Web of Trust uses trust transitivity to use links to the old key to trust signatures and links created by the new key. During a transition, both keys are trustworthy but you only use the newer one to sign documents and certify links in the web of trust.
 
 If you use smartcards (or plan to do so) then having more (encryption) keys creates a certain inconvenience (a card with the new key cannot decrypt old data encrypted with previous keys).
 
-Adding new keys leads to an increase in the length of the public key.
+**Note:** Adding new keys leads to an increase in the length of the public key.
 
 ### Add a photo
 
@@ -551,19 +571,19 @@ By default the encrypted file will be appended a `.gpg` suffix. This can be
 changed with the `--output <out-file>` option.
 
 To encrypt a file for personal use, `<key-id>` is simply the name or email
-address (or anything else) that was used during key generation.
+address (or anything else) that was used during key generation. If you choose a recipient `<key-id>` indicating someone else's public key, you will not be able to decrypt it but only the destinatary with his private key can.
 
 When encrypting or decrypting a document, it is possible to have more than one
 private key in use. In this case, we need to select the active key with the
-option `--local-user <key-id>`. Otherwise the default key is used.
-
-If the recipient is not specified, it will self-encrypt using its public key. If you choose a recipient indicating someone else's public key, you will not be able to decrypt it but only the destinatary with his private key can.
+option `--local-user <key-id>`. Otherwise, by default GnuPG will use the most recently key created.
 
 Decrypt a file that has been encrypted with our own public key:
 
 ```bash
 $ gpg [--output <out-file>] --decrypt <file>.gpg
 ```
+
+Regarding how private keys are selected with GnuPG: GnuPG will select the proper key automatically. Usually, the required key is stored in the crypto message's headers, otherwise GnuPG will try all of the private keys.
 
 Further options:
 
@@ -710,42 +730,11 @@ Example configuration files are included in this repository.
 
 [sks-pool]: https://sks-keyservers.net/overview-of-pools.php#pool_hkps
 
+**Reminder:** Update the public key every time some changes are made!
+
 TODO:
 
--   TODO, Link alle section
--   Reogranize (See gpg-guide vero)
 -   GitHub Key
 -   Sito (My old key # is lost!, My fingerprint is #, Every year at 01/05 my publi key change! (Expiration of subkeys modify my pub))
--   Controllare tutti le cartelle e i file delle config
-
-You're trying to delete a user ID, not a subkey. Use key [n] and delkey instead. From the help comand inside gpg --edit-key:
-
-uid         select user ID N
-key         select subkey N
-deluid      delete selected user IDs
-delkey      delete selected subkeys
-
-If you already shared your key with others, better revoke the key instead of deleting it. By deleting it, other's will not be able to realize you're not using it any more (you can't delete it on key servers and other's computers!), by revocation you're signalling "don't use this (sub)key any more".
-
-Private don't change. Master pub changed if i change expiration date or i add or do somtihign to subkeys.
-
-Pub si allunga solo per l'aggiunta di nuove chiavi/sottochiavi non della data di scadenza
-
-Se cifro un messaggio con una subkey mi servirà la chiave privata della subkeys per decifrarlo.
-La master privata serve solo per gestire le subkes non per decifrare.
-Ogni chiave decifra ciò che ha criptato sè stessa.
-
-Se ho due sub E come selezioni quella di default?
-gpg --default-key <yourKeyID> --sign-key <YourFriendsKeyID>
-
-Per vedere gli ID delle subkey bisogna nadare in edit
-
-These options are used to change the configuration and are usually found in the option file.
-\--default-key name
-    Use name as the default key to sign with. If this option is not used, the default key is the first key found in the secret keyring. Note that -u or --local-user overrides this option. This option may be given multiple times. In this case, the last key for which a secret key is available is used. If there is no secret key available for any of the specified values, GnuPG will not emit an error message but continue as if this option wasn’t given.
-
-    By default, GnuPG will use the most recently created
-
-Regarding how keys are selected with GnuPG: simply import the keys (gpg --import), GnuPG will select the proper key automatically. Usually, the required key is stored in the crypto message's headers, otherwise GnuPG will try all of the private keys.
-
-Quindi quando qualcuno usa la mia pub per criptare un file e inviarmelo di default usa la  pubblica della mia sottochiave E più recente. Io con il comando decrypt delego a GPG di trovare la privata (sarà quella E recente) per decifrare.
+-   Config
+-   QA Foglio

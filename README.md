@@ -4,7 +4,7 @@
 <img src="https://github.com/samuelexferri/gpg-guide/blob/master/images/lock.png" width="200">
 </p>
 
-A simple guide to GNU Privacy Guard
+A simple guide to GNU Privacy Guard enriched from various sources
 
 See [gpg-guide.md](https://github.com/samuelexferri/gpg-guide/blob/master/gpg-guide.md)!
 
