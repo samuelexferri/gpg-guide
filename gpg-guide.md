@@ -737,10 +737,3 @@ Example configuration files are included in this repository.
 [sks-pool]: https://sks-keyservers.net/overview-of-pools.php#pool_hkps
 
 **Reminder:** Update the public key every time some changes are made!
-
-TODO:
-
--   GitHub Key
--   Sito (My old key # is lost!, My fingerprint is #, Every year at 01/05 my publi key change! (Expiration of subkeys modify my pub))
--   Config
--   QA Foglio
