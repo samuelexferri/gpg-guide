@@ -240,6 +240,10 @@ Even worse, expiry dates might provide a false sense of security. The key on the
 
 See [backup](gpg-guide.md#backup) section and [renewal of an expired key](gpg-guide.md#renewal-of-an-expired-key) section.
 
+**Note:** Revocation certificate may change but an old revocation certificate also works and completely revokes the key and all subkeys and user IDs.
+
+**Note:** If you use the revocation certificate locally but the key has not been sent to the servers, you can cancel the revocation simply by deleting and reimporting the private keys from a previous backup.
+
 ### Backup
 
 Let’s save all keys:
@@ -595,6 +599,8 @@ Further options:
 
 **Note:** Each private subkey is independent of the others, each one decrypts the messages addressed to it. It is therefore better to have only one subkey per capability at a time.
 
+**Note:** In case someone sends you an encrypted file with your old public key, if you still have the old private key available you will be able to decrypt it, otherwise not. This is because in the old public key there are no new keys and changes made.
+
 ### Signing and checking signatures
 
 To avoid the risk that someone else claims to be you, it's useful to sign every
@@ -714,9 +720,9 @@ Example configuration files are included in this repository.
 
 -   [GPG Guide (GitHub)][gpg-guide]
 -   [The GNU Privacy Handbook][gnu-handbook]
--   [Debian subkeys][debian-subkeys]
--   [OpenPGP -The almost perfect keypair][eleven-labs]
--   [OpenPGP best practices][best-practices]
+-   [Debian Subkeys][debian-subkeys]
+-   [OpenPGP The almost perfect keypair][eleven-labs]
+-   [OpenPGP Best Practices][best-practices]
 
 [gpg-guide]: https://github.com/bfrg/gpg-guide
 
