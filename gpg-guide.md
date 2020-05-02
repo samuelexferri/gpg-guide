@@ -711,8 +711,6 @@ For most users the following files are sufficient:
 -   `gpg.conf`: standard configuration file read by `gpg` on startup. It may
     contain any long options that are available for `gpg`. A skeleton
     configuration file is generated on the very first run of `gpg`.
--   `gpg-agent.conf`: standard configuration file read by `gpg-agent` on startup.
-    The `gpg-agent` is a daemon to request and cache passphrases used by `gpg`.
 -   `dirmngr.conf`: standard configuration file read by `dirmngr` on startup.
     `dirmngr` takes care of accessing the OpenPGP keyservers and is also used for
     managing and downloading certificate revocation lists. A skeleton
