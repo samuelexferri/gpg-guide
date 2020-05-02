@@ -70,6 +70,8 @@ You might have to terminate `gpg-agent` so it gets restarted, if it does not see
 
 GnuPG also has a `--faketime` parameter, but it does only work if `--debug` is also set, which requires some compile options that are not always applied for production builds.
 
+You cannot take it for sure or even verify it, this is juts the date the signer "claims" to have signed the key on.
+
 _Back to the Future!_
 
 ## Creating new keys
