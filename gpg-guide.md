@@ -273,7 +273,7 @@ Let’s check that we have only the private keys of the subkeys:
 
     sec#  rsa4096 2020-05-01 [C] [expires: 2021-05-01]
           F4123A7E12AFACB0CEBB584E9016AAAFCA7213FE
-    uid           [ultimate] Mario Rossi (Hello World!) <mariorossi@gmail.com>
+    uid   [ultimate] Mario Rossi (Hello World!) <mariorossi@gmail.com>
     ssb   rsa4096 2020-05-01 [E] [expires: 2021-05-01]
     ssb   rsa4096 2020-05-01 [S] [expires: 2021-05-01]
     ssb   rsa4096 2020-05-01 [A] [expires: 2021-05-01]
@@ -535,6 +535,8 @@ $ gpg --with-fingerprint <key-file>
 
 For a more thorough discussion see for instance [The GNU Privacy
 Handbook][gnu-handbook].
+
+See [symmetric key encryption](gpg-guide.md#symmetric-key-encryption) section and [public key encryption](gpg-guide.md#public-key-encryption) section.
 
 ### Public key encryption
 
