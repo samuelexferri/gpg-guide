@@ -39,10 +39,10 @@ subkeys on the normal keyservers, and everyone else will use them instead of the
 You will need to use the master keys only in exceptional circumstances, namely when you want to modify your own or someone else's key.  More specifically, you need the master private key:
 
 -   when you sign someone else's key or revoke an existing signature.
--   when you add a new UID or mark an existing UID as `primary`.
+-   when you add a new UID or mark an existing UID as primary.
 -   when you create a new subkey.
 -   when you revoke an existing UID or subkey.
--   when you change the preferences (e.g., with `setpref`) on a UID.
+-   when you change the preferences (e.g. with `setpref`) on a UID.
 -   when you change the expiration date on your master key or any of its subkey.
 -   when you revoke or generate a revocation certificate for the complete key.
 
@@ -220,7 +220,7 @@ If you've got a revocation certificate and are sure you never might lose access 
 
 Even worse, expiry dates might provide a false sense of security. The key on the keyservers expired, so why bother to revoke it? There is a large number of well-connected RSA 512 bit keys on the keyserver network, and probably a comparabily large number of weak DSA keys (because of the Debian RNG problems). With faster processors and possibly new knowledge on algorithm weaknesses, an attacker might in future be able to crack the expired, but non-revoked key and use it!
 
-See [backup](bakcup) section and [renew an expired key](renew-an-expired-key) section.
+See [backup](gpg-guide.md#bakcup) section and [renewal of an expired key](gpg-guide.md#renewal-of-an-expired-key) section.
 
 ### Backup
 
@@ -245,7 +245,7 @@ $ gpg --allow-secret-key-import --import <key-id>.priv.asc
 ```
 
 The public key can be freely distributed by sending it to friends, publishing on
-websites or registering it with public [keyservers](keyservers).
+websites or registering it with public [keyservers](gpg-guide.md#keyservers).
 In order to encrypt a documents for another user as well as to verify their
 signatures, we need their public key.
 
@@ -339,7 +339,7 @@ default-key <key-id>
 
 Replacing `<key-id>` with the key ID you want to use by default.
 
-### Renewal an expired key
+### Renewal of an expired key
 
 The expiration date of a key can be changed any time, even after it expired:
 
@@ -351,7 +351,7 @@ $ gpg --edit-key <key-id>
 # gpg> save
 ```
 
-Then you may send your key to the [keyservers](keyservers) to publish this change:
+Then you may send your key to the [keyservers](gpg-guide.md#keyservers) to publish this change:
 
 ```bash
 $ gpg --send-key <key-id>
