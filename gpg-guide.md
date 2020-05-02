@@ -376,8 +376,6 @@ Then you may send your key to the [keyservers](gpg-guide.md#keyservers) to publi
 $ gpg --send-key <key-id>
 ```
 
-**Note:** Private keys never expire, only public keys does.
-
 You can always extend your expiration date, even after it has expired! This “expiration” is actually more of a safety valve or “dead-man switch” that will automatically trigger at some point. If you have access to the secret key material, you can untrigger it. The point is to setup something to disable your key in case you lose access to it (and have no revocation certificate).
 
 Setting an expiration date means that you will need to extend that expiration date sometime in the future. That is a small task that you will need to remember to do (_set a calendar event to remind you about your expiration date_).
@@ -386,11 +384,15 @@ For subkeys, the effect is rather simple: after a given time frame, the subkey w
 
 For primary keys, the situation is different. If you have access to the private key, you can change the expiry date as you wish. This means, if an attacker gets access to your private key, he can extend the validity period arbitrarily. Worst case, you lose access to the private key at the same time, then even you cannot revoke the public key any more (you do have a printed or otherwise offline and safely stored revocation certificate, do you?). An expiry date might help in the case you just lose control over the key (while no attacker has control over it). The key will automatically expire after a given time, so there wouldn't be an unusable key with your name on it sitting forever on the keyservers.
 
-**Note:** Private key don't change, public key yes! A public key changes if you change an expiration date or manage subkeys or user ID information. In particular, the public key is extended only for substantial changes (addition of keys, addition of user ID) but not for changing the expiration date!
+**Note:** Private keys never expire, only public keys does.
 
-### Replacement of a compromised key
+**Note:** Private keys don't change, public keys yes! A public key changes for every modifications. In particular, the public key becomes longer only for substantial changes (addition of keys, addition of user ID) but not for changing the expiration date (changes but remains the same length).
 
-When replacing one uncompromised key with a newer (typically longer) one, using a transition period when both keys are trustworthy and participate in the Web of Trust uses trust transitivity to use links to the old key to trust signatures and links created by the new key. During a transition, both keys are trustworthy but you only use the newer one to sign documents and certify links in the web of trust.
+### Replace a key
+
+If your key has been compromised, you must not use a transition period as described below. Revoke the compromised key immediately and create a new one. Consider all web of trust links signed by the old key as suspect. You must establish a completely new set of links.
+
+When replacing one uncompromised key with a newer (typically longer) one, using a transition period when both keys are trustworthy and participate in the Web of Trust uses trust transitivity to use links to the old key to trust signatures and links created by the new key. During a transition, both keys are trustworthy but you only use the newer one to sign documents and certify links in the Web of Trust.
 
 If you use smartcards (or plan to do so) then having more (encryption) keys creates a certain inconvenience (a card with the new key cannot decrypt old data encrypted with previous keys).
 
@@ -407,7 +409,7 @@ $ gpg --edit-key <key-id>
 # gpg> save
 ```
 
-The image must be a JPEG file. Remember that the image is stored within your public key. If you use a very large picture, your key will become very large as well. Keeping the image close to 240x288 is a good size to use.
+The image must be a `JPEG file`. Remember that the image is stored within your public key. If you use a very large picture, your key will become very large as well. Keeping the image close to `240x288` is a good size to use.
 
 ### Add an additional UID
 
@@ -416,11 +418,11 @@ Additional email addresses can be added to the key:
 ```bash
 $ gpg --edit-key <key-id>
 # gpg> adduid
-# (follow prompt).
+# (follow prompt)
 # gpg> save
 ```
 
-If more UIDs were added to a key, we can set a primary UID:
+If more UIDs were added to a key, you can set a primary UID:
 
 ```bash
 $ gpg --edit-key <key-id>
@@ -455,8 +457,8 @@ the keyserver is established using a protocol called **hkps**.
 
 Other keyservers:
 
--   pool.sks-keyservers.net
 -   keys.openpgp.org (Default)
+-   pool.sks-keyservers.net
 -   pgp.mit.edu
 -   zimmermann.mayfirst.org
 -   keyring.debian.org
@@ -470,9 +472,9 @@ To fetch keys automatically from a keyserver as needed, add the following to
 
     keyserver-options auto-key-retrieve
 
-More details on how to setup a keyserver, see [GPG Best
-Practices][best-practices]. Note that since GnuPG 2.1 some options have been
+Note that since GnuPG 2.1 some options have been
 moved to `dirmngr` and must be added to `~/.gnupg/dirmngr.conf`.
+More details on how to setup a keyserver, see [GPG Best Practices][best-practices].
 
 #### Tip: Ensure that all keys are refreshed through the keyserver you have selected
 
@@ -510,7 +512,7 @@ $ gpg --lsign-key '<fingerprint>'
 
 If you are confident you have the right fingerprint from the owner of the key, the preferred method is to locally sign the key. If you want to publicly advertise your connection to the person who owns the key, you can do a publicly exportable `--sign-key` instead.
 
-Note the single quote marks above (’), which should surround your full fingerprint and are necessary to make this command work. Double-quotes (") also work.
+Note the single quote marks above (’), which should surround your full fingerprint and are necessary to make this command work; double-quotes (") also work.
 
 #### Tip: Don't rely on the key ID
 
@@ -565,7 +567,7 @@ After a public key has been imported, we can encrypt a file or message to that
 recipient:
 
 ```bash
-$ gpg [--output <out-file>] --recipient <key-id> --encrypt <file>
+$ gpg --recipient <key-id> [--output <out-file>] [--local-user <key-id>] --encrypt <file>
 ```
 
 By default the encrypted file will be appended a `.gpg` suffix. This can be
@@ -576,15 +578,15 @@ address (or anything else) that was used during key generation. If you choose a 
 
 When encrypting or decrypting a document, it is possible to have more than one
 private key in use. In this case, we need to select the active key with the
-option `--local-user <key-id>`. Otherwise, by default GnuPG will use the most recently key created.
+option `--local-user <key-id>`. Otherwise, by default, GnuPG will use the most recently key created.
 
 Decrypt a file that has been encrypted with our own public key:
 
 ```bash
-$ gpg [--output <out-file>] --decrypt <file>.gpg
+$ gpg [--output <out-file>] --decrypt <file.gpg>
 ```
 
-Regarding how private keys are selected with GnuPG: GnuPG will select the proper key automatically. Usually, the required key is stored in the crypto message's headers, otherwise GnuPG will try all of the private keys.
+Regarding how private keys are selected with GnuPG during decryption: GnuPG will select the proper key automatically. Usually, the required key is stored in the crypto message's headers, otherwise GnuPG will try all of the private keys stored.
 
 Further options:
 
@@ -594,9 +596,9 @@ Further options:
       encrypted message to hide receivers of message against traffic analysis.
 -   `--no-emit-version`: avoid printing version number in ASCII armored output.
 
-**Note:** Each private subkey is independent of the others, each one decrypts the messages addressed to it. It is therefore better to have only one subkey per capability at a time.
+**Note:** Each private subkey is "independent" from the others, each one only decodes the messages addressed to it. It is therefore better to have only one subkey per capability at a time.
 
-**Note:** In case someone sends you an encrypted file with your old public key, if you still have the old private key available you will be able to decrypt it, otherwise not. This is because in the old public key there are no new keys and changes made.
+**Note:** In case someone sends you an encrypted file with your old public key, if you still have the old private key available you will be able to decrypt it, otherwise not. This is because in the old public key there are no new keys created and changes made.
 
 ### Signing and checking signatures
 
@@ -607,7 +609,7 @@ verification of the signature will fail.
 Sign a file with your own key:
 
 ```bash
-$ gpg --output <file.sig> --sign <file>
+$ gpg [--output <file.sig>] --sign <file>
 ```
 
 Note that the file is compressed before being signed. The output will be in
@@ -615,7 +617,7 @@ binary format and thus won't be _human-readable_. To make a clear text
 signature, run:
 
 ```bash
-$ gpg --output <file.sig> --clearsign <file>
+$ gpg [--output <file.sig>] --clearsign <file>
 ```
 
 This causes the document to be wrapped in an ASCII-armored signature but
@@ -628,7 +630,7 @@ must edit the files to recover the original (since signature is now part of
 document). It is also possible to make a detached signature to a file:
 
 ```bash
-$ gpg --armor --output <file.sig> --detach-sign <file>
+$ gpg [--armor] [--output <file.sig>] --detach-sign <file>
 ```
 
 This is highly recommended when signing binary files (like tar archives).
