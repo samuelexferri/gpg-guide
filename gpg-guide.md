@@ -253,7 +253,7 @@ To revoke your key, import the revocation certificate:
 $ gpg --import <key-id>.revoke.asc
 ```
 
-If a [keyserver](gpg-guide.md#keyservers) is used, update the keyserver as well:
+If a [keyserver](#keyservers) is used, update the keyserver as well:
 
 ```bash
 $ gpg --keyserver <keyserver-name> --send <key-id>
