@@ -598,7 +598,7 @@ Further options:
 
 **Note:** Each private subkey is "independent" from the others, each one only decodes the messages addressed to it. It is therefore better to have only one subkey per capability at a time.
 
-**Note:** In case someone sends you an encrypted file with your old public key, if you still have the old private key available you will be able to decrypt it, otherwise not. This is because in the old public key there are no new keys created and changes made.
+**Note:** In case someone sends you an encrypted file with your old public key (meanwhile you update it), if you still have the old private subkey available you will be able to decrypt it, otherwise not. This is because in the old public key there are no new subkeys created or changes made like the extension of the expiration date.
 
 ### Signing and checking signatures
 
