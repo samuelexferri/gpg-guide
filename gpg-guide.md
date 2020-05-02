@@ -630,7 +630,7 @@ must edit the files to recover the original (since signature is now part of
 document). It is also possible to make a detached signature to a file:
 
 ```bash
-$ gpg [--armor] [--output <file.sig>] --detach-sign <file>
+$ gpg [--output <file.sig>] [--armor] --detach-sign <file>
 ```
 
 This is highly recommended when signing binary files (like tar archives).
@@ -651,13 +651,13 @@ When an encrypted file has been signed, the signature is usually checked when
 the file is decrypted using the `--decrypt` option:
 
 ```bash
-$ gpg --output <file> --decrypt <file.gpg>
+$ gpg [--output <file>] --decrypt <file.gpg>
 ```
 
 To just check the signature use the `--verify` option:
 
 ```bash
-$ gpg --verify <pgp-file/sig-file>
+$ gpg --verify <file.sig> <file.gpg>
 ```
 
 This assumes the signer's public key has already been imported.
@@ -673,7 +673,7 @@ $ gpg --verify archive.tar.gz.asc archive.tar.gz
 ### Symmetric key encryption
 
 Documents can be encrypted with a symmetric cipher using a passphrase. The
-default cipher used is AES-128 but can be changed with the `--cipher-algo`
+default cipher used is `AES-128` but can be changed with the `--cipher-algo`
 option.
 
 Encrypt a file using a symmetric key:
@@ -682,12 +682,12 @@ Encrypt a file using a symmetric key:
 $ gpg --symmetric <file>
 ```
 
-This will create an encrypted file with a .gpg appended to the old file name.
+This will create an encrypted file with a `.gpg` appended to the old file name.
 
 Decrypt the encrypted file:
 
 ```bash
-$ gpg [--output myfile] --decrypt myfile.gpg
+$ gpg [--output <file>] --decrypt <file.gpg>
 ```
 
 The user will be prompted to enter the passphrase used to encrypt.
@@ -697,8 +697,8 @@ The user will be prompted to enter the passphrase used to encrypt.
 -   [GPG Guide (GitHub)][gpg-guide]
 -   [The GNU Privacy Handbook][gnu-handbook]
 -   [Debian Subkeys][debian-subkeys]
--   [OpenPGP The almost perfect keypair][eleven-labs]
 -   [OpenPGP Best Practices][best-practices]
+-   [OpenPGP The almost perfect keypair][eleven-labs]
 
 [gpg-guide]: https://github.com/bfrg/gpg-guide
 
@@ -706,9 +706,9 @@ The user will be prompted to enter the passphrase used to encrypt.
 
 [debian-subkeys]: https://wiki.debian.org/Subkeys
 
-[eleven-labs]: https://blog.eleven-labs.com/en/openpgp-almost-perfect-key-pair-part-1/
-
 [best-practices]: https://riseup.net/en/gpg-best-practices
+
+[eleven-labs]: https://blog.eleven-labs.com/en/openpgp-almost-perfect-key-pair-part-1/
 
 [sks-pool]: https://sks-keyservers.net/overview-of-pools.php#pool_hkps
 
