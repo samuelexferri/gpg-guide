@@ -110,7 +110,7 @@ The user will be prompted to answer several questions:
 1.  Algorithm: `RSA (set your own capabilities)`.
 2.  Capability: only `Certify (C)`; disable the default capabilities by entering the related letter, one capability after the other.
 3.  Size: `4096 bits`.
-4.  Expiration date: a period of a year is enough most of the time; it's possible to change it afterwards.
+4.  Expiration date: a period of a year is enough most of the time; it's possible to change it afterwards (for primary key is useless).
 5.  Details: real name, email address and comment for the key's purpose.
 6.  Passphrase (also blank space admitted).
 
@@ -241,19 +241,19 @@ should no longer be used. After generating a new key it is recommended to
 immediately generate a revocation certificate:
 
 ```bash
-$ gpg --output revoke.asc --gen-revoke <key-id>
+$ gpg --output <key-id>.revoke.asc --gen-revoke <key-id>
 ```
 
-Store the file `revoke.asc` somewhere safe (_print this certificate_). It can be used to revoke the key
+Store the file `<key-id>.revoke.asc` somewhere safe (_print this certificate_). It can be used to revoke the key
 later when the private key is compromised.
 
 To revoke your key, import the revocation certificate:
 
 ```bash
-$ gpg --import revoke.asc
+$ gpg --import <key-id>.revoke.asc
 ```
 
-If a keyserver is used, update the keyserver as well:
+If a [keyserver](gpg-guide.md#keyservers) is used, update the keyserver as well:
 
 ```bash
 $ gpg --keyserver <keyserver-name> --send <key-id>
@@ -437,13 +437,13 @@ $ gpg --edit-key <key-id>
 Send public key to keyserver, so that others can retrieve the key:
 
 ```bash
-$ gpg --send-keys <key-id> --keyserver <keyserver-name>
+$ gpg --keyserver <keyserver-name> --send-keys <key-id>
 ```
 
 Find details about a key on the keyserver w/o importing it:
 
 ```bash
-$ gpg --search-keys <key-id> --keyserver <keyserver-name>
+$ gpg --keyserver <keyserver-name> --search-keys <key-id>
 ```
 
 Import key from a keyserver:
