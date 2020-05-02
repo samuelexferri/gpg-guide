@@ -6,7 +6,7 @@
 
 A simple guide to GNU Privacy Guard
 
-See [gpg-guide.md`](https://github.com/samuelexferri/gpg-guide/blob/master/gpg-guide.md)!
+See [gpg-guide.md](https://github.com/samuelexferri/gpg-guide/blob/master/gpg-guide.md)!
 
 ![alt text](https://img.shields.io/badge/Language-English-infomrmational?style=for-the-badge)
 
