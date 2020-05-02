@@ -56,7 +56,7 @@ One might be tempted to have one subkey per machine so that you only need to exc
 
 But this only works for signing subkeys. If you have multiple encryption subkeys, gpg is said to encrypt only for the most recent encryption subkey and not for all known and not revoked encryption subkeys.
 
-## GnuPG configuration files
+## Configuration files
 
 The home directory where **GnuPG** and its helper tools look for configuration
 files defaults to `~/.gnupg/` (see also `--homedir` option). By default the
@@ -83,17 +83,17 @@ In OpenGPG there is no defined "not valid before" parameter. There is the creati
 
 GnuPG does not know an option to set the creation time, but the system time is used. The easiest and most general way is to change the system time to the desired date.
 
-For Linux, there is the very helpful tool `faketime`, which can be used to start other commands with arbitrary dates:
+For Linux, there is the very helpful tool `faketime`, which can be used to start other commands with arbitrary dates using timezone GMT (UTC+00):
 
-    faketime '2020-01-01 00:00:00' gpg --expert --full-gen-key
+```bash
+faketime '2020-01-01 00:00:00' gpg --expert --full-gen-key
+```
 
 You might have to terminate `gpg-agent` so it gets restarted, if it does not see (but use) the faked time.
 
 GnuPG also has a `--faketime` parameter, but it does only work if `--debug` is also set, which requires some compile options that are not always applied for production builds.
 
-You cannot take it for sure or even verify it, this is juts the date the signer "claims" to have signed the key on.
-
-Timezone used is GMT (UTC+00).
+How to trust? You cannot take it for sure or even verify it, this is just the date the signer "claims" to have signed the key on.
 
 _Back to the Future!_
 
@@ -142,7 +142,7 @@ Let's create subkeys, it is important to have one dedicated to each task:
 
 -   `Authenticate (A)`: authenticating is used to sign other people's public keys, as you "certify" that the key belongs to them, so if you know Bob, and you know Alice, but Alice doesn't know Bob, but you have signed both their keys, when Alice looks up Bob's public key and sees your signature on the public key, she knows she's got the right one.
 -   `Sign (S)`: signing is affixing a digital signature to a message or file, verifying that the message/file must have come from you, and only you.
--   `Encrypt (E)`: encrypting is to use your private key to encrypt a message to your public key, so you can encrypt a file/message that you and only you can decrypt; otherwise, someone use the public key to encrypt something, and you use the private key to decrypt it.
+-   `Encrypt (E)`: encrypting is to use your private key to encrypt a message or file to your public key, so you can encrypt a message/file that you and only you can decrypt; otherwise, someone uses your public key to encrypt a message or file and only you can decrypt it using your private key.
 
 First list the available keys:
 
@@ -184,7 +184,7 @@ $ gpg --list-sigs
 $ gpg --fingerprint
 ```
 
-List private (secret) keys:
+List private keys:
 
 ```bash
 $ gpg --list-secret-keys
@@ -202,7 +202,7 @@ Delete a private key:
 $ gpg --delete-secret-key <key-id>
 ```
 
-If you already shared your key with others, better revoke the key instead of deleting it. By deleting it, other's will not be able to realize you're not using it any more (you can't delete it on key servers and other's computers!), by revocation you're signalling "don't use this (sub)key any more".
+If you already shared your key with others, better revoke the key instead of deleting it. By deleting it, other's will not be able to realize you're not using it any more (you can't delete it on keyservers and other's computers!), by revocation you are signalling to not use this (sub)key any more.
 
 **Note:** `<key-id>` refers to a key by the name of its owner, email address,
 the key's fingerprint, by its 8-digit hex ID or similar.
@@ -213,11 +213,11 @@ To open a menu for editing key related tasks, run:
 
 ```bash
 $ gpg --edit-key <key-id>
-# gpg> key 1 (refers to a sub-key (e.g. the first one))
+# gpg> key 1 (refers to a subkey (e.g. the first one))
 # gpg> (command)
 ```
 
-Note: `key <num>` toggle a sub-key, all selected keys are displayed with `sub*`; by default primary key is selected. Similar is `uid <num>` to toggle a user IDs.
+**Note:** `key <num>` is a command to toggle a subkey, all selected subkeys are displayed with `sub*`; by default primary key is selected. Similar is `uid <num>` to toggle a user IDs.
 
 Useful commands:
 
@@ -238,13 +238,13 @@ Useful commands:
 If for instance the private key bas been stolen, the UID has been changed or you
 forget the passphrase, it is important to notify others that the public key
 should no longer be used. After generating a new key it is recommended to
-immediately generate a **revocation certificate**:
+immediately generate a revocation certificate:
 
 ```bash
 $ gpg --output revoke.asc --gen-revoke <key-id>
 ```
 
-Store the file `revoke.asc` somewhere safe (it is smart to print this certificate). It can be used to revoke the key
+Store the file `revoke.asc` somewhere safe (_print this certificate_). It can be used to revoke the key
 later when the private key is compromised.
 
 To revoke your key, import the revocation certificate:
@@ -261,13 +261,13 @@ $ gpg --keyserver <keyserver-name> --send <key-id>
 
 If you've got a revocation certificate and are sure you never might lose access to both your private key and revocation certificate at the same time (consider fire, (physical) theft, official institutions searching your house), there is absolutely no use in setting an expiry date apart from possible confusion and more work extending it.
 
-Even worse, expiry dates might provide a false sense of security. The key on the keyservers expired, so why bother to revoke it? There is a large number of well-connected RSA 512 bit keys on the keyserver network, and probably a comparabily large number of weak DSA keys (because of the Debian RNG problems). With faster processors and possibly new knowledge on algorithm weaknesses, an attacker might in future be able to crack the expired, but non-revoked key and use it!
+Even worse, expiry dates might provide a false sense of security. The key on the keyservers expired, so why bother to revoke it? There is a large number of well-connected RSA 512 bit keys on the keyserver network, and probably a comparabily large number of weak DSA keys (because of the Debian RNG problems). With faster processors and possibly new knowledge on algorithm weaknesses, an attacker might in future be able to crack the expired, but non-revoked, key and use it!
+
+**Note:** Revocation certificate change after some modifications to the keys but an old revocation certificate also works and completely revokes the key with all subkeys and user IDs.
+
+**Note:** If you use the revocation certificate locally but the key revoked has not been sent to the servers, you can undo the revocation simply by deleting and reimporting the private keys from a previous backup.
 
 See [backup](gpg-guide.md#backup) section and [renewal of an expired key](gpg-guide.md#renewal-of-an-expired-key) section.
-
-**Note:** Revocation certificate may change but an old revocation certificate also works and completely revokes the key and all subkeys and user IDs.
-
-**Note:** If you use the revocation certificate locally but the key has not been sent to the servers, you can cancel the revocation simply by deleting and reimporting the private keys from a previous backup.
 
 ### Backup
 
@@ -279,17 +279,17 @@ $ gpg --export-secret-keys --armor <key-id> > <key-id>.priv.asc
 $ gpg --export-secret-subkeys --armor <key-id> > <key-id>.subpriv.asc
 ```
 
-By default GnuPG writes to STDOUT if no file is specified with the
+By default GnuPG writes to `STDOUT` if no file is specified with the
 `--output <file>` option.
 If no `<key-id>` has been entered, all present keys will be exported.
-
-Keep your primary (private) key entirely offline! This is tricky to do but helps in protecting the very important primary key. If your primary key is stolen, the attacker can create new identities, revoke existing ones and completely impersonate you. Storing keys “offline” is therefore a good way to protect against such attacks.
 
 Import backup of a private key:
 
 ```bash
 $ gpg --allow-secret-key-import --import <key-id>.priv.asc
 ```
+
+Keep your primary private key entirely offline! This is tricky to do but helps in protecting the very important primary key. If your primary key is stolen, the attacker can create new identities, revoke existing ones and completely impersonate you. Storing keys “offline” is therefore a good way to protect against such attacks.
 
 The public key can be freely distributed by sending it to friends, publishing on
 websites or registering it with public [keyservers](gpg-guide.md#keyservers).
@@ -303,6 +303,8 @@ $ gpg --import <key-id>.pub.asc
 ```
 
 ### Daily use
+
+We need to have only private subkeys on the computer and keep in a safe place our primary private key and the revocation certificate.
 
 Let’s delete all private keys:
 
@@ -327,9 +329,9 @@ Let’s check that we have only the private keys of the subkeys:
 
 The small `#` after `sec` indicates that the secret key of the master key no longer exists, it’s a stub instead.
 
-Your computer is now ready for normal use!
+_Your computer is now ready for normal use!_
 
-When you need to use the master keys, mount the encrypted USB drive,
+When you need to use the master key, mount the encrypted USB drive,
 and set the `GNUPGHOME` environment variable:
 
 ```bash
@@ -348,43 +350,13 @@ The latter command should now list your private key with `sec` and not
 
 ### Set a default key
 
-It is a good practice to configure this key as the default key within the `~/.bashrc` file, in order to specify its use as automatic with other applications that use the GnuPG system. To do this just insert the line in the `~/.bashrc` file:
-
-```bash
-export GPGKEY=<key-id>
-```
-
-**Note:** `<key-id>` is a primary key ID, not a subkey ID.
-
-Now you need to restart the encryption service. Depending on your system, you may need to end one of the following two processes:
-
-```bash
-# gpg-agent:
-
-$ killall -q gpg-agent
-$ eval $(gpg-agent --daemon)
-
-# seahorse-agent:
-
-$ killall -q seahorse-agent
-$ eval $(seahorse-agent --daemon)
-```
-
-Finally, run this command:
-
-```bash
-$ source ~/.bashrc
-```
-
-**Alternative:**
-
-To choose a default key without having to specify `--default-key` on the command-line every time, create a configuration file (if it doesn't already exist), `~/.gnupg/gpg.conf`, and add a line containing
+To choose a default key without having to specify `--default-key` on the command-line every time, create a configuration file (if it doesn't already exist), `~/.gnupg/gpg.conf`, and add a line containing:
 
 ```bash
 default-key <key-id>
 ```
 
-Replacing `<key-id>` with the key ID you want to use by default.
+Replacing `<key-id>` with the primary key ID you want to use by default.
 
 ### Renewal of an expired key
 
@@ -392,7 +364,7 @@ The expiration date of a key can be changed any time, even after it expired:
 
 ```bash
 $ gpg --edit-key <key-id>
-# gpg> key 1 (only if you need to update a sub-key (e.g. the first one), by default primary key is selected)
+# gpg> key 1 (only if you need to update a subkey (e.g. the first one), by default primary key is selected)
 # gpg> expire
 # (follow prompts)
 # gpg> save
@@ -408,7 +380,7 @@ $ gpg --send-key <key-id>
 
 You can always extend your expiration date, even after it has expired! This “expiration” is actually more of a safety valve or “dead-man switch” that will automatically trigger at some point. If you have access to the secret key material, you can untrigger it. The point is to setup something to disable your key in case you lose access to it (and have no revocation certificate).
 
-Setting an expiration date means that you will need to extend that expiration date sometime in the future. That is a small task that you will need to remember to do (set a calendar event to remind you about your expiration date).
+Setting an expiration date means that you will need to extend that expiration date sometime in the future. That is a small task that you will need to remember to do (_set a calendar event to remind you about your expiration date_).
 
 For subkeys, the effect is rather simple: after a given time frame, the subkey will expire. This expiry date can only be changed using the primary key. If an attacker gets hold of your subkey (and only this), it will automatically be inactivated after the expiry date.The expiry date of a subkey is a great tool to announce you switch your subkeys on a regular base, and that it's time for others to update your key after a given time.
 
