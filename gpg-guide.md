@@ -15,7 +15,7 @@ nobody else being able to read messages encrypted for you.
 
 ### What are subkeys?
 
-OpenPGP further supports subkeys, which are like the normal keys,
+**OpenPGP** further supports subkeys, which are like the normal keys,
 except they're
 bound to a master keypair. A subkey can be used for signing or for
 encryption. The really useful part of subkeys is that they can
@@ -56,9 +56,9 @@ One might be tempted to have one subkey per machine so that you only need to exc
 
 But this only works for signing subkeys. If you have multiple encryption subkeys, gpg is said to encrypt only for the most recent encryption subkey and not for all known and not revoked encryption subkeys.
 
-## GPG configuration files
+## GnuPG configuration files
 
-The home directory where GnuPG and its helper tools look for configuration
+The home directory where **GnuPG** and its helper tools look for configuration
 files defaults to `~/.gnupg/` (see also `--homedir` option). By default the
 directory has its permissions set to `700`, and the files it contains have their
 permissions set to `600`. It is very important to keep `~/.gnupg/` private and
@@ -76,6 +76,26 @@ For most users the following files are sufficient:
     configuration file is generated on the very first run of `gpg`.
 
 Example configuration files are included in this repository.
+
+## Faking the creation time
+
+In OpenGPG there is no defined "not valid before" parameter. There is the creation timestamp, but there is no defined behavior for dates in the future; implementations of OpenPGP might issue a warning, completely deny using the key or simply ignore the fact at all.
+
+GnuPG does not know an option to set the creation time, but the system time is used. The easiest and most general way is to change the system time to the desired date.
+
+For Linux, there is the very helpful tool `faketime`, which can be used to start other commands with arbitrary dates:
+
+    faketime '2020-01-01 00:00:00' gpg --expert --full-gen-key
+
+You might have to terminate `gpg-agent` so it gets restarted, if it does not see (but use) the faked time.
+
+GnuPG also has a `--faketime` parameter, but it does only work if `--debug` is also set, which requires some compile options that are not always applied for production builds.
+
+You cannot take it for sure or even verify it, this is juts the date the signer "claims" to have signed the key on.
+
+Timezone used is GMT (UTC+00).
+
+_Back to the Future!_
 
 ## Creating new keys
 
@@ -153,27 +173,6 @@ Now we have an OpenPGP keypair with its identity and three subkeys with each a c
     sub   rsa4096 2020-05-01 [A] [expires: 2021-05-01]
     sub   rsa4096 2020-05-01 [S] [expires: 2021-05-01]
     sub   rsa4096 2020-05-01 [E] [expires: 2021-05-01]
-
-
-    ### Faking the creation time
-
-    In OpenGPG there is no defined "not valid before" parameter. There is the creation timestamp, but there is no defined behavior for dates in the future; implementations of OpenPGP might issue a warning, completely deny using the key or simply ignore the fact at all.
-
-    GnuPG does not know an option to set the creation time, but the system time is used. The easiest and most general way is to change the system time to the desired date.
-
-    For Linux, there is the very helpful tool `faketime`, which can be used to start other commands with arbitrary dates:
-
-        faketime '2020-01-01 00:00:00' gpg --expert --full-gen-key
-
-    You might have to terminate `gpg-agent` so it gets restarted, if it does not see (but use) the faked time.
-
-    GnuPG also has a `--faketime` parameter, but it does only work if `--debug` is also set, which requires some compile options that are not always applied for production builds.
-
-    You cannot take it for sure or even verify it, this is juts the date the signer "claims" to have signed the key on.
-
-    Timezone used is GMT (UTC+00).
-
-    _Back to the Future!_
 
 ## Key administration
 
