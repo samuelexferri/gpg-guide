@@ -220,7 +220,7 @@ If you've got a revocation certificate and are sure you never might lose access 
 
 Even worse, expiry dates might provide a false sense of security. The key on the keyservers expired, so why bother to revoke it? There is a large number of well-connected RSA 512 bit keys on the keyserver network, and probably a comparabily large number of weak DSA keys (because of the Debian RNG problems). With faster processors and possibly new knowledge on algorithm weaknesses, an attacker might in future be able to crack the expired, but non-revoked key and use it!
 
-See [backup](gpg-guide.md#bakcup) section and [renewal of an expired key](gpg-guide.md#renewal-of-an-expired-key) section.
+See [backup](gpg-guide.md#backup) section and [renewal of an expired key](gpg-guide.md#renewal-of-an-expired-key) section.
 
 ### Backup
 
