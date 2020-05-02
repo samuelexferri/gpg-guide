@@ -15,21 +15,21 @@ nobody else being able to read messages encrypted for you.
 
 ### What are subkeys?
 
-OpenPGP further supports subkeys, which are like the normal keys,
+**OpenPGP** further supports subkeys, which are like the normal keys,
 except they're
-bound to a master key pair. A subkey can be used for signing or for
+bound to a master keypair. A subkey can be used for signing or for
 encryption. The really useful part of subkeys is that they can
 be revoked independently of the master keys, and also stored separately
 from them.
 
-In other words, subkeys are like a separate key pair, but automatically
-associated with your main key pair.
+In other words, subkeys are like a separate keypair, but automatically
+associated with your main keypair.
 
 ### Why?
 
 Subkeys make key management easier!
 
-The master key pair is quite important:
+The master keypair is quite important:
 it is the best proof of your identity online and if
 you lose it, you'll need to start building your reputation from scratch.
 
@@ -58,7 +58,7 @@ But this only works for signing subkeys. If you have multiple encryption subkeys
 
 ## Creating new keys
 
-First create a master keypair (private and public key):
+First create a master keypair (private and public keys):
 
 ```bash
 $ gpg --expert --full-gen-key
@@ -67,7 +67,7 @@ $ gpg --expert --full-gen-key
 The user will be prompted to answer several questions:
 
 1.  Algorithm: `RSA (set your own capabilities)`.
-2.  Capability: only `Certify (C)`; disable the default capabilities by entering the related letter one capability after the other.
+2.  Capability: only `Certify (C)`; disable the default capabilities by entering the related letter, one capability after the other.
 3.  Size: `4096 bits`.
 4.  Expiration date: a period of a year is enough most of the time; it's possible to change it afterwards.
 5.  Details: real name, email address and comment for the key's purpose.
@@ -79,7 +79,7 @@ In another terminal, in order to create entropy, run a disk write performance be
 $ dd bs=1M count=1024 if=/dev/zero of=test conv=fdatasync
 ```
 
-When finished, it will display:
+When the master keys were created, it will display:
 
     gpg: key 9016AAAFCA7213FE marked as ultimately trusted
     gpg: revocation certificate stored as '/home/user/.gnupg/openpgp-revocs.d/F4123A7E12AFACB0CEBB584E9016AAAFCA7213FE.rev'
@@ -89,21 +89,21 @@ When finished, it will display:
           F4123A7E12AFACB0CEBB584E9016AAAFCA7213FE
     uid   Mario Rossi (Hello World!) <mariorossi@gmail.com>
 
-Key ID is `9016AAAFCA7213FE`.
+Where:
 
-Key Fingerprint is `F412 3A7E 12AF ACB0 CEBB 584E 9016 AAAF CA72 13FE`.
+-   Key ID is `9016AAAFCA7213FE`.
 
-The master key is your `Certify (C)` key for certification. It is the key used to sign other people's keys and your own subkeys and identities.
+-   Key Fingerprint is `F412 3A7E 12AF ACB0 CEBB 584E 9016 AAAF CA72 13FE`.
+
+The master key is your `Certify (C)` key for certification. It is the key used to sign other people's keys and to manage your own subkeys and identities.
 
 Let's create subkeys, it is important to have one dedicated to each task:
 
 -   `Authenticate (A)`: authenticating is used to sign other people's public keys, as you "certify" that the key belongs to them, so if you know Bob, and you know Alice, but Alice doesn't know Bob, but you have signed both their keys, when Alice looks up Bob's public key and sees your signature on the public key, she knows she's got the right one.
 -   `Sign (S)`: signing is affixing a digital signature to a message or file, verifying that the message/file must have come from you, and only you.
--   `Encrypt (E)`: encrypting is to use your private key to encrypt a message to your public key, so you can encrypt a file/message that you and only you can decrypt; otherwise, encrypting is to use your private key to decrypt a file/message that someone else encrypted to your public key.
+-   `Encrypt (E)`: encrypting is to use your private key to encrypt a message to your public key, so you can encrypt a file/message that you and only you can decrypt; otherwise, someone use the public key to encrypt something, and you use the private key to decrypt it.
 
-TODO
-
-We will first list the available keys:
+First list the available keys:
 
 ```bash
 $ gpg --list-keys
@@ -112,7 +112,7 @@ $ gpg --list-keys
 Edit it to add subkeys: to do this, you will need to switch to expert mode:
 
 ```bash
-$ gpg --expert --edit-key 9016AAAFCA7213FE
+$ gpg --expert --edit-key <key-id>
 ```
 
 You are now in edit mode. Add the authentication key with the `addkey` command and repeat the procedure for the encryption and signing keys.
@@ -121,14 +121,13 @@ You are now in edit mode. Add the authentication key with the `addkey` command a
 # gpg> addkey
 # (follow prompts)
 # gpg> save
-# gpg> quit
 ```
 
-Now we have an OpenPGP key pair with its identity and three subkeys with each a capability.
+Now we have an OpenPGP keypair with its identity and three subkeys with each a capability.
 
     pub   rsa4096 2020-05-01 [C] [expires: 2021-05-01]
           F4123A7E12AFACB0CEBB584E9016AAAFCA7213FE
-    uid           [ultimate] Mario Rossi (Hello World!) <mariorossi@gmail.com>
+    uid   [ultimate] Mario Rossi (Hello World!) <mariorossi@gmail.com>
 
     sub   rsa4096 2020-05-01 [A] [expires: 2021-05-01]
     sub   rsa4096 2020-05-01 [S] [expires: 2021-05-01]
@@ -140,20 +139,14 @@ List public keys:
 
 ```bash
 $ gpg --list-keys
-$ gpg --list-sigs   # list signatures
-$ gpg --fingerprint # list fingerprints
+$ gpg --list-sigs
+$ gpg --fingerprint
 ```
 
 List private (secret) keys:
 
 ```bash
 $ gpg --list-secret-keys
-```
-
-Print a key:
-
-```bash
-$ gpg -v --fingerprint <key-id>
 ```
 
 Delete a public key:
@@ -171,22 +164,31 @@ $ gpg --delete-secret-key <key-id>
 **Note:** `<key-id>` refers to a key by the name of its owner, email address,
 the key's fingerprint, by its 8-digit hex ID or similar.
 
+### Edit a key
+
 To open a menu for editing key related tasks, run:
 
 ```bash
 $ gpg --edit-key <key-id>
+# gpg> key 1 (refers to a sub-key (e.g. the first one))
+# gpg> (command)
 ```
+
+Note: `key <num>` toggle a sub-key, all selected keys are displayed with `sub*`; by default primary key is selected. Similar is `uid <num>` to toggle a user IDs.
 
 Useful commands:
 
--   `help`:   display all commands
--   `passwd`: change passphrase
--   `clean`:  compact any user ID that is no longer usable (revoked or expired)
--   `revkey`: revoke a key
--   `expire`: change expiration date of key
--   `addkey`: add a subkey to this key
--   `addphoto`: add a subkey to this key
--   `adduid`: add email addresses to this key
+-   `help`: display all commands.
+-   `pref`: show preferences.
+-   `keyserver`: set a default keyserver.
+-   `adduid`: add user ID to this key.
+-   `addphoto`: add a photo to this key.
+-   `addkey`: add a subkey to this key.
+-   `enable/disable`: enable/disable selected keys.
+-   `passwd`: change passphrase.
+-   `clean`: compact any user ID that is no longer usable (revoked or expired).
+-   `revkey`: revoke a key.
+-   `expire`: change expiration date of key.
 
 ### Revocation certificate
 
@@ -218,6 +220,8 @@ If you've got a revocation certificate and are sure you never might lose access 
 
 Even worse, expiry dates might provide a false sense of security. The key on the keyservers expired, so why bother to revoke it? There is a large number of well-connected RSA 512 bit keys on the keyserver network, and probably a comparabily large number of weak DSA keys (because of the Debian RNG problems). With faster processors and possibly new knowledge on algorithm weaknesses, an attacker might in future be able to crack the expired, but non-revoked key and use it!
 
+See [backup](bakcup) section and [renew an expired key](renew-an-expired-key) section.
+
 ### Backup
 
 Let’s save all keys:
@@ -225,7 +229,7 @@ Let’s save all keys:
 ```bash
 $ gpg --export --armor <key-id> > <key-id>.pub.asc
 $ gpg --export-secret-keys --armor <key-id> > <key-id>.priv.asc
-$ gpg --export-secret-subkeys --armor <key-id> > <key-id>.sub_priv.asc
+$ gpg --export-secret-subkeys --armor <key-id> > <key-id>.subpriv.asc
 ```
 
 By default GnuPG writes to STDOUT if no file is specified with the
@@ -234,21 +238,21 @@ If no `<key-id>` has been entered, all present keys will be exported.
 
 Keep your primary (private) key entirely offline! This is tricky to do but helps in protecting the very important primary key. If your primary key is stolen, the attacker can create new identities, revoke existing ones and completely impersonate you. Storing keys “offline” is therefore a good way to protect against such attacks.
 
+Import backup of a private key:
+
+```bash
+$ gpg --allow-secret-key-import --import <key-id>.priv.asc
+```
+
 The public key can be freely distributed by sending it to friends, publishing on
-websites or registering it with public keyserver.
+websites or registering it with public [keyservers](keyservers).
 In order to encrypt a documents for another user as well as to verify their
-signatures, we need their public key. TODO
+signatures, we need their public key.
 
 Import someone else's public key:
 
 ```bash
 $ gpg --import <key-id>.pub.asc
-```
-
-Import backup of a private key:
-
-```bash
-$ gpg --allow-secret-key-import --import <key-id>.priv.asc
 ```
 
 ### Daily use
@@ -274,22 +278,22 @@ Let’s check that we have only the private keys of the subkeys:
     ssb   rsa4096 2020-05-01 [S] [expires: 2021-05-01]
     ssb   rsa4096 2020-05-01 [A] [expires: 2021-05-01]
 
-The small `#` before `sec` indicates that the secret key of the master key no longer exists, it’s a stub instead.
+The small `#` after `sec` indicates that the secret key of the master key no longer exists, it’s a stub instead.
 
-Your computer is now ready for normal use.
+Your computer is now ready for normal use!
 
 When you need to use the master keys, mount the encrypted USB drive,
 and set the `GNUPGHOME` environment variable:
 
 ```bash
-export GNUPGHOME=/media/something
-gpg -K
+$ export GNUPGHOME=/media/something
+$ gpg -K
 ```
 
 or use the `--homedir` command-line argument:
 
 ```bash
-gpg --homedir=/media/something -K
+$ gpg --homedir=/media/something -K
 ```
 
 The latter command should now list your private key with `sec` and not
@@ -300,21 +304,23 @@ The latter command should now list your private key with `sec` and not
 It is a good practice to configure this key as the default key within the `~/.bashrc` file, in order to specify its use as automatic with other applications that use the GnuPG system. To do this just insert the line in the `~/.bashrc` file:
 
 ```bash
-$ export GPGKEY=<key-id>
+export GPGKEY=<key-id>
 ```
+
+**Note:** `<key-id>` is a primary key ID, not a subkey ID.
 
 Now you need to restart the encryption service. Depending on your system, you may need to end one of the following two processes:
 
 ```bash
-# seahorse-agent:
-
-$ killall -q seahorse-agent
-$ eval $(seahorse-agent --daemon)
-
 # gpg-agent:
 
 $ killall -q gpg-agent
 $ eval $(gpg-agent --daemon)
+
+# seahorse-agent:
+
+$ killall -q seahorse-agent
+$ eval $(seahorse-agent --daemon)
 ```
 
 Finally, run this command:
@@ -323,15 +329,17 @@ Finally, run this command:
 $ source ~/.bashrc
 ```
 
-TODO (Qua sotto aggiunto)
+**Alternative:**
 
 To choose a default key without having to specify `--default-key` on the command-line every time, create a configuration file (if it doesn't already exist), `~/.gnupg/gpg.conf`, and add a line containing
 
-`default-key <key-id>`
+```bash
+default-key <key-id>
+```
 
-Teplacing `<key-id>` with the key uid you want to use by default.
+Replacing `<key-id>` with the key ID you want to use by default.
 
-### Renew an expired key
+### Renewal an expired key
 
 The expiration date of a key can be changed any time, even after it expired:
 
@@ -343,7 +351,7 @@ $ gpg --edit-key <key-id>
 # gpg> save
 ```
 
-Then you may send your key to the keyservers to publish this change:
+Then you may send your key to the [keyservers](keyservers) to publish this change:
 
 ```bash
 $ gpg --send-key <key-id>
@@ -359,13 +367,13 @@ For subkeys, the effect is rather simple: after a given time frame, the subkey w
 
 For primary keys, the situation is different. If you have access to the private key, you can change the expiry date as you wish. This means, if an attacker gets access to your private key, he can extend the validity period arbitrarily. Worst case, you lose access to the private key at the same time, then even you cannot revoke the public key any more (you do have a printed or otherwise offline and safely stored revocation certificate, do you?). An expiry date might help in the case you just lose control over the key (while no attacker has control over it). The key will automatically expire after a given time, so there wouldn't be an unusable key with your name on it sitting forever on the keyservers.
 
-### Replacing a compromised key
+### Replacement of a compromised key
 
-When replacing one uncompromised key with a newer (typically longer) one, using a transition period when both keys are trustworthy and participate in the web of trust uses trust transitivity to use links to the old key to trust signatures and links created by the new key. During a transition, both keys are trustworthy but you only use the newer one to sign documents and certify links in the web of trust.
+When replacing one uncompromised key with a newer (typically longer) one, using a transition period when both keys are trustworthy and participate in the Web of Trust uses trust transitivity to use links to the old key to trust signatures and links created by the new key. During a transition, both keys are trustworthy but you only use the newer one to sign documents and certify links in the web of trust.
 
-If you use smartcards (or plan to do so) then having more (encryption) keys creates a certain inconvenience (a card with the new key cannot decrypt old data).
+If you use smartcards (or plan to do so) then having more (encryption) keys creates a certain inconvenience (a card with the new key cannot decrypt old data encrypted with previous keys).
 
-TODO
+Adding new keys leads to an increase in the length of the public key.
 
 ### Add a photo
 
@@ -378,7 +386,7 @@ $ gpg --edit-key <key-id>
 # gpg> save
 ```
 
-The image must be a JPEG file. Remember that the image is stored within your public key. If you use a very large picture, your key will become very large as well! Keeping the image close to 240x288 is a good size to use.
+The image must be a JPEG file. Remember that the image is stored within your public key. If you use a very large picture, your key will become very large as well. Keeping the image close to 240x288 is a good size to use.
 
 ### Add an additional UID
 
@@ -406,7 +414,7 @@ $ gpg --edit-key <key-id>
 Send public key to keyserver, so that others can retrieve the key:
 
 ```bash
-$ gpg --keyserver <keyserver-name> --send-keys <key-id>
+$ gpg --send-keys <key-id> --keyserver <keyserver-name>
 ```
 
 Find details about a key on the keyserver w/o importing it:
@@ -415,7 +423,7 @@ Find details about a key on the keyserver w/o importing it:
 $ gpg --search-keys <key-id> --keyserver <keyserver-name>
 ```
 
-Import key from keyserver:
+Import key from a keyserver:
 
 ```bash
 $ gpg --recv-keys <key-id>
@@ -427,25 +435,31 @@ the keyserver is established using a protocol called **hkps**.
 Other keyservers:
 
 -   pool.sks-keyservers.net
--   keys.openpgp.org
+-   keys.openpgp.org (Default)
 -   pgp.mit.edu
--   keyserver.pgp.com
--   keys.gnupg.net
 -   zimmermann.mayfirst.org
 -   keyring.debian.org
 -   keyserver.ubuntu.com
 
-Note: The `--keyserver` option is not required, when the keyserver is specified
+The `--keyserver` option is not required, when the keyserver is specified
 in `~/.gnupg/dirmngr.conf`.
 
 To fetch keys automatically from a keyserver as needed, add the following to
 `~/.gnupg/gpg.conf`:
 
-        keyserver-options autokey-retrieve
+    keyserver-options auto-key-retrieve
 
 More details on how to setup a keyserver, see [GPG Best
 Practices][best-practices]. Note that since GnuPG 2.1 some options have been
 moved to `dirmngr` and must be added to `~/.gnupg/dirmngr.conf`.
+
+#### Tip: Ensure that all keys are refreshed through the keyserver you have selected
+
+When creating a key, individuals may designate a specific keyserver to use to pull their keys from. It is recommended that you use the following option to `~/.gnupg/gpg.conf`, which will ignore such designations:
+
+    keyserver-options no-honor-keyserver-url
+
+This is useful because it prevents someone from designating an insecure method for pulling their key and if the server designated uses hkps, the refresh will fail because the ca-cert will not match, so the keys will never be refreshed. Note also that an attacker could designate a keyserver that they control to monitor when or from where you refresh their key.
 
 #### Tip: Don't blindly trust keys from keyservers
 
@@ -493,10 +507,10 @@ $ gpg --with-fingerprint --list-secret-key
 
 Check key fingerprints before importing.
 
-If you received or downloaded a key in a , you can and should display its fingerprint before importing it into your keyring, in that way you can verify the fingerprint without possibly spoiling your keyring and adding a compromised key:
+If you received or downloaded a key you can and should display its fingerprint before importing it into your keyring, in that way you can verify the fingerprint without possibly spoiling your keyring and adding a compromised key:
 
 ```bash
-$ gpg --with-fingerprint <keyfile>
+$ gpg --with-fingerprint <key-file>
 ```
 
 ## Encryption
@@ -522,21 +536,17 @@ $ gpg --with-fingerprint <keyfile>
 For a more thorough discussion see for instance [The GNU Privacy
 Handbook][gnu-handbook].
 
-In the following we will primarily discuss **public key encryption**. A brief
-introduction to symmetric key encryption is given in the last
-[section](#symmetric-key-encryption). TODO
-
 ### Public key encryption
 
 After a public key has been imported, we can encrypt a file or message to that
 recipient:
 
 ```bash
-$ gpg [--output <outfile>] --recipient <key-id> --encrypt <some-file>
+$ gpg [--output <out-file>] --recipient <key-id> --encrypt <file>
 ```
 
 By default the encrypted file will be appended a `.gpg` suffix. This can be
-changed with the `--output <outfile>` option.
+changed with the `--output <out-file>` option.
 
 To encrypt a file for personal use, `<key-id>` is simply the name or email
 address (or anything else) that was used during key generation.
@@ -545,21 +555,23 @@ When encrypting or decrypting a document, it is possible to have more than one
 private key in use. In this case, we need to select the active key with the
 option `--local-user <key-id>`. Otherwise the default key is used.
 
+If the recipient is not specified, it will self-encrypt using its public key. If you choose a recipient indicating someone else's public key, you will not be able to decrypt it but only the destinatary with his private key can.
+
 Decrypt a file that has been encrypted with our own public key:
 
 ```bash
-$ gpg --output somefile.txt --decrypt somefile.txt.gpg
+$ gpg [--output <out-file>] --decrypt <file>.gpg
 ```
-
-It will prompt for the passphrase and then decrypt and write the data to the
-file specified with the `--output` option.
 
 Further options:
 
--   `--armor, -a`: encrypt file using ASCII text
+-   `--armor, -a`: encrypt file using ASCII text.
+-   `--recipient-file <key-file>`: using a public key from a file.
 -   `--hidden-recipient <user-id>, -R <user-id>`: put recipient key IDs in the
-      encrypted message to hide receivers of message against traffic analysis
--   `--no-emit-version`: avoid printing version number in ASCII armored output
+      encrypted message to hide receivers of message against traffic analysis.
+-   `--no-emit-version`: avoid printing version number in ASCII armored output.
+
+**Note:** Each private subkey is independent of the others, each one decrypts the messages addressed to it. It is therefore better to have only one subkey per capability at a time.
 
 ### Signing and checking signatures
 
@@ -570,7 +582,7 @@ verification of the signature will fail.
 Sign a file with your own key:
 
 ```bash
-$ gpg --sign <file> --output <file.sig>
+$ gpg --output <file.sig> --sign <file>
 ```
 
 Note that the file is compressed before being signed. The output will be in
@@ -578,7 +590,7 @@ binary format and thus won't be _human-readable_. To make a clear text
 signature, run:
 
 ```bash
-$ gpg --clearsign <file> --output <file.sig>
+$ gpg --output <file.sig> --clearsign <file>
 ```
 
 This causes the document to be wrapped in an ASCII-armored signature but
@@ -599,10 +611,12 @@ This is highly recommended when signing binary files (like tar archives).
 Sign and encrypt a file:
 
 ```bash
-$ gpg --sign <file> [--armor] --encrypt --recipient <user-id> [--local-user <key-id>]
+$ gpg --recipient <user-id> [--local-user <key-id>] [--armor] --sign --encrypt <file>
 ```
 
-`--local-user <key-id>` specifies the key to sign with, it overrides
+**Note:** GnuPG first signs a message, then encrypts it.
+
+String `--local-user <key-id>` specifies the key to sign with, it overrides
 `--default-key <key-id>` option, which is usually specified in
 `~/.gnupg/gpg.conf`.
 
@@ -629,7 +643,7 @@ the signer's public key as follows:
 $ gpg --verify archive.tar.gz.asc archive.tar.gz
 ```
 
-## Symmetric key encryption
+### Symmetric key encryption
 
 Documents can be encrypted with a symmetric cipher using a passphrase. The
 default cipher used is AES-128 but can be changed with the `--cipher-algo`
@@ -674,31 +688,29 @@ For most users the following files are sufficient:
 
 Example configuration files are included in this repository.
 
-TODO
-
 ## References
 
 -   [GPG Guide (GitHub)][gpg-guide]
 -   [The GNU Privacy Handbook][gnu-handbook]
+-   [Debian subkeys][debian-subkeys]
 -   [OpenPGP -The almost perfect keypair][eleven-labs]
 -   [OpenPGP best practices][best-practices]
--   [Debian subkeys][debian-subkeys]
 
 [gpg-guide]: https://github.com/bfrg/gpg-guide
 
 [gnu-handbook]: https://www.gnupg.org/gph/en/manual.html
 
+[debian-subkeys]: https://wiki.debian.org/Subkeys
+
 [eleven-labs]: https://blog.eleven-labs.com/en/openpgp-almost-perfect-key-pair-part-1/
 
 [best-practices]: https://riseup.net/en/gpg-best-practices
-
-[debian-subkeys]: https://wiki.debian.org/Subkeys
 
 [sks-pool]: https://sks-keyservers.net/overview-of-pools.php#pool_hkps
 
 TODO:
 
--   TODO, Ortogrphy, Link alle section, Grassetto
+-   TODO, Link alle section
 -   Reogranize (See gpg-guide vero)
 -   GitHub Key
 -   Sito (My old key # is lost!, My fingerprint is #, Every year at 01/05 my publi key change! (Expiration of subkeys modify my pub))
