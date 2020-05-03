@@ -86,7 +86,7 @@ GnuPG does not know an option to set the creation time, but the system time is u
 For Linux, there is the very helpful tool `faketime`, which can be used to start other commands with arbitrary dates using timezone GMT (UTC+00):
 
 ```bash
-faketime '2020-01-01 00:00:00' gpg --expert --full-gen-key
+$ faketime '2020-01-01 00:00:00' gpg --expert --full-gen-key
 ```
 
 You might have to terminate `gpg-agent` so it gets restarted, if it does not see (but use) the faked time.
