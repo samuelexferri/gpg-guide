@@ -4,37 +4,23 @@
 
 ### What are keys?
 
-In public key cryptography, a key is actually a pair: a public key, and a
-private key. You use the private key to digitally sign files, and others
-use the public key to verify the signature. Or, others use the public key
-to encrypt something, and you use the private key to decrypt it.
+In public key cryptography, a key is actually a pair: a public key, and a private key. You use the private key to digitally sign files, and others use the public key to verify the signature. Or, others use the public key to encrypt something, and you use the private key to decrypt it.
 
-As long as only you have access to the private key, other people can
-rely on your digital signatures being made by you, and you can rely on
-nobody else being able to read messages encrypted for you.
+As long as only you have access to the private key, other people can rely on your digital signatures being made by you, and you can rely on nobody else being able to read messages encrypted for you.
 
 ### What are subkeys?
 
-**OpenPGP** further supports subkeys, which are like the normal keys,
-except they're
-bound to a master keypair. A subkey can be used for signing or for
-encryption. The really useful part of subkeys is that they can
-be revoked independently of the master keys, and also stored separately
-from them.
+**OpenPGP** further supports subkeys, which are like the normal keys, except they're bound to a master keypair. A subkey can be used for signing or for encryption. The really useful part of subkeys is that they can be revoked independently of the master keys, and also stored separately from them.
 
-In other words, subkeys are like a separate keypair, but automatically
-associated with your main keypair.
+In other words, subkeys are like a separate keypair, but automatically associated with your main keypair.
 
 ### Why?
 
 Subkeys make key management easier!
 
-The master keypair is quite important:
-it is the best proof of your identity online and if
-you lose it, you'll need to start building your reputation from scratch.
+The master keypair is quite important: it is the best proof of your identity online and if you lose it, you'll need to start building your reputation from scratch.
 
-Subkeys make life easier: you already have an automatically created encryption subkey and you create another subkey for signing, and you keep those on your main computer. You publish the
-subkeys on the normal keyservers, and everyone else will use them instead of the master keys for encrypting messages or verifying your message signatures. Likewise, you will use the subkeys for decrypting and signing messages.
+Subkeys make life easier: you already have an automatically created encryption subkey and you create another subkey for signing, and you keep those on your main computer. You publish the subkeys on the normal keyservers, and everyone else will use them instead of the master keys for encrypting messages or verifying your message signatures. Likewise, you will use the subkeys for decrypting and signing messages.
 
 You will need to use the master keys only in exceptional circumstances, namely when you want to modify your own or someone else's key.  More specifically, you need the master private key:
 
@@ -48,7 +34,7 @@ You will need to use the master keys only in exceptional circumstances, namely w
 
 (Because each of these operation is done by adding a new self- or revocation signatures from the private master key).
 
-Since each link of the Web of Trust is an endorsement of the binding between a public key and a user ID, OpenPGP certification signatures (from the signer's private master key) are relative to a UID and are irrelevant for subkeys.  In particular, subkey creation or revocation does not affect the reputation of the master key.  So in case your subkey gets stolen while your master key remains safe, you can revoke the compromised subkey and replace it with a new subkey without having to rebuild your reputation and without reducing reputation of other people's keys signed with your master key.
+Since each link of the Web of Trust is an endorsement of the binding between a public key and a user ID, OpenPGP certification signatures (from the signer's private master key) are relative to a UID and are irrelevant for subkeys. In particular, subkey creation or revocation does not affect the reputation of the master key.  So in case your subkey gets stolen while your master key remains safe, you can revoke the compromised subkey and replace it with a new subkey without having to rebuild your reputation and without reducing reputation of other people's keys signed with your master key.
 
 ### Multiple Subkeys per Machine vs. One Single Subkey for All Machines
 
@@ -58,22 +44,12 @@ But this only works for signing subkeys. If you have multiple encryption subkeys
 
 ## Configuration files
 
-The home directory where **GnuPG** and its helper tools look for configuration
-files defaults to `~/.gnupg/` (see also `--homedir` option). By default the
-directory has its permissions set to `700`, and the files it contains have their
-permissions set to `600`. It is very important to keep `~/.gnupg/` private and
-have a secure backup stored on a seperate disk as it contains all files
-generated by the `gpg` command including the private keys.
+The home directory where **GnuPG** and its helper tools look for configuration files defaults to `~/.gnupg/` (see also `--homedir` option). By default the directory has its permissions set to `700`, and the files it contains have their permissions set to `600`. It is very important to keep `~/.gnupg/` private and have a secure backup stored on a seperate disk as it contains all files generated by the `gpg` command including the private keys.
 
 For most users the following files are sufficient:
 
--   `gpg.conf`: standard configuration file read by `gpg` on startup. It may
-    contain any long options that are available for `gpg`. A skeleton
-    configuration file is generated on the very first run of `gpg`.
--   `dirmngr.conf`: standard configuration file read by `dirmngr` on startup.
-    It takes care of accessing the OpenPGP keyservers and is also used for
-    managing and downloading certificate revocation lists. A skeleton
-    configuration file is generated on the very first run of `gpg`.
+-   `gpg.conf`: standard configuration file read by `gpg` on startup. It may contain any long options that are available for `gpg`. A skeleton configuration file is generated on the very first run of `gpg`.
+-   `dirmngr.conf`: standard configuration file read by `dirmngr` on startup. It takes care of accessing the OpenPGP keyservers and is also used for managing and downloading certificate revocation lists. A skeleton configuration file is generated on the very first run of `gpg`.
 
 Example configuration files are included in this repository.
 
@@ -204,8 +180,7 @@ $ gpg --delete-secret-key <key-id>
 
 If you already shared your key with others, better revoke the key instead of deleting it. By deleting it, other's will not be able to realize you're not using it any more (you can't delete it on keyservers and other's computers!), by revocation you are signalling to not use this (sub)key any more.
 
-**Note:** `<key-id>` refers to a key by the name of its owner, email address,
-the key's fingerprint, by its 8-digit hex ID or similar.
+**Note:** `<key-id>` refers to a key by the name of its owner, email address, the key's fingerprint, by its 8-digit hex ID or similar.
 
 ### Edit a key
 
@@ -235,17 +210,13 @@ Useful commands:
 
 ### Revocation certificate
 
-If for instance the private key bas been stolen, the UID has been changed or you
-forget the passphrase, it is important to notify others that the public key
-should no longer be used. After generating a new key it is recommended to
-immediately generate a revocation certificate:
+If for instance the private key bas been stolen, the UID has been changed or you forget the passphrase, it is important to notify others that the public key should no longer be used. After generating a new key it is recommended to immediately generate a revocation certificate:
 
 ```bash
 $ gpg --output <key-id>.revoke.asc --gen-revoke <key-id>
 ```
 
-Store the file `<key-id>.revoke.asc` somewhere safe (_print this certificate_). It can be used to revoke the key
-later when the private key is compromised.
+Store the file `<key-id>.revoke.asc` somewhere safe (_print this certificate_). It can be used to revoke the key later when the private key is compromised.
 
 To revoke your key, import the revocation certificate:
 
@@ -279,9 +250,7 @@ $ gpg --export-secret-keys --armor <key-id> > <key-id>.priv.asc
 $ gpg --export-secret-subkeys --armor <key-id> > <key-id>.subpriv.asc
 ```
 
-By default GnuPG writes to `STDOUT` if no file is specified with the
-`--output <file>` option.
-If no `<key-id>` has been entered, all present keys will be exported.
+By default GnuPG writes to `STDOUT` if no file is specified with the `--output <file>` option. If no `<key-id>` has been entered, all present keys will be exported.
 
 Import backup of a private key:
 
@@ -291,10 +260,7 @@ $ gpg --allow-secret-key-import --import <key-id>.priv.asc
 
 Keep your primary private key entirely offline! This is tricky to do but helps in protecting the very important primary key. If your primary key is stolen, the attacker can create new identities, revoke existing ones and completely impersonate you. Storing keys “offline” is therefore a good way to protect against such attacks.
 
-The public key can be freely distributed by sending it to friends, publishing on
-websites or registering it with public [keyservers](#keyservers).
-In order to encrypt a documents for another user as well as to verify their
-signatures, we need their public key.
+The public key can be freely distributed by sending it to friends, publishing on websites or registering it with public [keyservers](#keyservers). In order to encrypt a documents for another user as well as to verify their signatures, we need their public key.
 
 Import someone else's public key:
 
@@ -331,8 +297,7 @@ The small `#` after `sec` indicates that the secret key of the master key no lon
 
 _Your computer is now ready for normal use!_
 
-When you need to use the master key, mount the encrypted USB drive,
-and set the `GNUPGHOME` environment variable:
+When you need to use the master key, mount the encrypted USB drive, and set the `GNUPGHOME` environment variable:
 
 ```bash
 $ export GNUPGHOME=/media/something
@@ -345,8 +310,7 @@ or use the `--homedir` command-line argument:
 $ gpg --homedir=/media/something -K
 ```
 
-The latter command should now list your private key with `sec` and not
-`sec#`.
+The latter command should now list your private key with `sec` and not `sec#`.
 
 ### Set a default key
 
@@ -452,8 +416,7 @@ Import key from a keyserver:
 $ gpg --recv-keys <key-id>
 ```
 
-The [sks keyservers pool][sks-pool] is often recommended. The communication with
-the keyserver is established using a protocol called **hkps**.
+The [sks keyservers pool][sks-pool] is often recommended. The communication with the keyserver is established using a protocol called **hkps**.
 
 Other keyservers:
 
@@ -464,16 +427,13 @@ Other keyservers:
 -   keyring.debian.org
 -   keyserver.ubuntu.com
 
-The `--keyserver` option is not required, when the keyserver is specified
-in `~/.gnupg/dirmngr.conf`.
+The `--keyserver` option is not required, when the keyserver is specified in `~/.gnupg/dirmngr.conf`.
 
-To fetch keys automatically from a keyserver as needed, add the following to
-`~/.gnupg/gpg.conf`:
+To fetch keys automatically from a keyserver as needed, add the following to `~/.gnupg/gpg.conf`:
 
     keyserver-options auto-key-retrieve
 
-Note that since GnuPG 2.1 some options have been
-moved to `dirmngr` and must be added to `~/.gnupg/dirmngr.conf`.
+Note that since GnuPG 2.1 some options have been moved to `dirmngr` and must be added to `~/.gnupg/dirmngr.conf`.
 More details on how to setup a keyserver, see [GPG Best Practices][best-practices].
 
 #### Tip: Ensure that all keys are refreshed through the keyserver you have selected
@@ -540,45 +500,27 @@ $ gpg --with-fingerprint <key-file>
 
 GnuPG supports both symmetric key encryption and public key encryption:
 
-1.  **Symmetric key encryption:** The same key is used for both encryption and
-    decryption. Two parties communicating using a symmetric cipher must agree on
-    the key beforehand. Once they agree, the sender encrypts a document using the
-    key, sends it to the receiver, and the receiver decrypts it using the same
-    key. The primary problem with symmetric key encryption is the key exchange.
-    If there are `n` people who need to communicate, then `n(n-1)/2` keys are
-    needed for each pair of people to communicate privately.
+1.  **Symmetric key encryption:** The same key is used for both encryption and decryption. Two parties communicating using a symmetric cipher must agree on the key beforehand. Once they agree, the sender encrypts a document using the key, sends it to the receiver, and the receiver decrypts it using the same key. The primary problem with symmetric key encryption is the key exchange. If there are `n` people who need to communicate, then `n(n-1)/2` keys are needed for each pair of people to communicate privately.
 
-2.  **Public key encryption:** This involves creation of a public and private key
-    pair. The private key should never be shared with anyone, while the public
-    key is supposed to be shared with people who want to send you encrypted data.
-    Documents are encrypted using the public key. Later the encrypted file is
-    decrypted with the private key and a passphrase that was set during key
-    generation. As opposed to symmetric key encryption, only `n` keypairs are
-    needed for `n` people to communicate privately.
+2.  **Public key encryption:** This involves creation of a public and private key pair. The private key should never be shared with anyone, while the public key is supposed to be shared with people who want to send you encrypted data. Documents are encrypted using the public key. Later the encrypted file is decrypted with the private key and a passphrase that was set during key generation. As opposed to symmetric key encryption, only `n` keypairs are needed for `n` people to communicate privately.
 
-For a more thorough discussion see for instance [The GNU Privacy
-Handbook][gnu-handbook].
+For a more thorough discussion see for instance [The GNU Privacy Handbook][gnu-handbook].
 
 See [symmetric key encryption](#symmetric-key-encryption) section and [public key encryption](#public-key-encryption) section.
 
 ### Public key encryption
 
-After a public key has been imported, we can encrypt a file or message to that
-recipient:
+After a public key has been imported, we can encrypt a file or message to that recipient:
 
 ```bash
 $ gpg --recipient <key-id> [--output <out-file>] [--local-user <key-id>] --encrypt <file>
 ```
 
-By default the encrypted file will be appended a `.gpg` suffix. This can be
-changed with the `--output <out-file>` option.
+By default the encrypted file will be appended a `.gpg` suffix. This can be changed with the `--output <out-file>` option.
 
-To encrypt a file for personal use, `<key-id>` is simply the name or email
-address (or anything else) that was used during key generation. If you choose a recipient `<key-id>` indicating someone else's public key, you will not be able to decrypt it but only the destinatary with his private key can.
+To encrypt a file for personal use, `<key-id>` is simply the name or email address (or anything else) that was used during key generation. If you choose a recipient `<key-id>` indicating someone else's public key, you will not be able to decrypt it but only the destinatary with his private key can.
 
-When encrypting or decrypting a document, it is possible to have more than one
-private key in use. In this case, we need to select the active key with the
-option `--local-user <key-id>`. Otherwise, by default, GnuPG will use the most recently key created.
+When encrypting or decrypting a document, it is possible to have more than one private key in use. In this case, we need to select the active key with the option `--local-user <key-id>`. Otherwise, by default, GnuPG will use the most recently key created.
 
 Decrypt a file that has been encrypted with our own public key:
 
@@ -592,8 +534,7 @@ Further options:
 
 -   `--armor, -a`: encrypt file using ASCII text.
 -   `--recipient-file <key-file>`: using a public key from a file.
--   `--hidden-recipient <user-id>, -R <user-id>`: put recipient key IDs in the
-      encrypted message to hide receivers of message against traffic analysis.
+-   `--hidden-recipient <user-id>, -R <user-id>`: put recipient key IDs in the encrypted message to hide receivers of message against traffic analysis.
 -   `--no-emit-version`: avoid printing version number in ASCII armored output.
 
 **Note:** Each private subkey is "independent" from the others, each one only decodes the messages addressed to it. It is therefore better to have only one subkey per capability at a time.
@@ -602,9 +543,7 @@ Further options:
 
 ### Signing and checking signatures
 
-To avoid the risk that someone else claims to be you, it's useful to sign every
-document that is encrypted. If the encrypted document is modified in any way, a
-verification of the signature will fail.
+To avoid the risk that someone else claims to be you, it's useful to sign every document that is encrypted. If the encrypted document is modified in any way, a verification of the signature will fail.
 
 Sign a file with your own key:
 
@@ -612,22 +551,16 @@ Sign a file with your own key:
 $ gpg [--output <file.sig>] --sign <file>
 ```
 
-Note that the file is compressed before being signed. The output will be in
-binary format and thus won't be _human-readable_. To make a clear text
+Note that the file is compressed before being signed. The output will be in binary format and thus won't be _human-readable_. To make a clear text
 signature, run:
 
 ```bash
 $ gpg [--output <file.sig>] --clearsign <file>
 ```
 
-This causes the document to be wrapped in an ASCII-armored signature but
-otherwise does not modify the document. Hence, the content in a clear text
-signature is readable w/o any special software. OpenPGP software is only
-required to verify the signature.
+This causes the document to be wrapped in an ASCII-armored signature but otherwise does not modify the document. Hence, the content in a clear text signature is readable w/o any special software. OpenPGP software is only required to verify the signature.
 
-A disadvantage of above methods is that users who received the signed documents
-must edit the files to recover the original (since signature is now part of
-document). It is also possible to make a detached signature to a file:
+A disadvantage of above methods is that users who received the signed documents must edit the files to recover the original (since signature is now part of document). It is also possible to make a detached signature to a file:
 
 ```bash
 $ gpg [--output <file.sig>] [--armor] --detach-sign <file>
@@ -643,12 +576,9 @@ $ gpg --recipient <user-id> [--local-user <key-id>] [--armor] --sign --encrypt <
 
 **Note:** GnuPG first signs a message, then encrypts it.
 
-String `--local-user <key-id>` specifies the key to sign with, it overrides
-`--default-key <key-id>` option, which is usually specified in
-`~/.gnupg/gpg.conf`.
+String `--local-user <key-id>` specifies the key to sign with, it overrides `--default-key <key-id>` option, which is usually specified in `~/.gnupg/gpg.conf`.
 
-When an encrypted file has been signed, the signature is usually checked when
-the file is decrypted using the `--decrypt` option:
+When an encrypted file has been signed, the signature is usually checked when the file is decrypted using the `--decrypt` option:
 
 ```bash
 $ gpg [--output <file>] --decrypt <file.gpg>
@@ -662,9 +592,7 @@ $ gpg --verify <file.sig> <file.gpg>
 
 This assumes the signer's public key has already been imported.
 
-Assuming we downloaded a file `archive.tar.gz` and a corresponding detached
-signature `archive.tar.gz.asc`, we can verify the signature after downloading
-the signer's public key as follows:
+Assuming we downloaded a file `archive.tar.gz` and a corresponding detached signature `archive.tar.gz.asc`, we can verify the signature after downloading the signer's public key as follows:
 
 ```bash
 $ gpg --verify archive.tar.gz.asc archive.tar.gz
@@ -672,9 +600,7 @@ $ gpg --verify archive.tar.gz.asc archive.tar.gz
 
 ### Symmetric key encryption
 
-Documents can be encrypted with a symmetric cipher using a passphrase. The
-default cipher used is `AES-128` but can be changed with the `--cipher-algo`
-option.
+Documents can be encrypted with a symmetric cipher using a passphrase. The default cipher used is `AES-128` but can be changed with the `--cipher-algo` option.
 
 Encrypt a file using a symmetric key:
 
